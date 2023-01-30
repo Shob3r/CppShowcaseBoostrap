@@ -1,4 +1,15 @@
 ﻿C:\Program Files\Microsoft Visual Studio\2022\Community\MSBuild\Microsoft\VC\v170\Microsoft.CppBuild.targets(503,5): warning MSB8004: Output Directory does not end with a trailing slash.  This build instance will add the slash as it is required to allow proper evaluation of the Output Directory.
 C:\Program Files\Microsoft Visual Studio\2022\Community\MSBuild\Microsoft\VC\v170\Microsoft.CppBuild.targets(517,5): warning MSB8028: The intermediate directory (x64\Debug\) contains files shared from another project (C++.vcxproj).  This can lead to incorrect clean and rebuild behavior.
   CppShowcaseBootstrap.cpp
-  CppShowcaseBootstrap.vcxproj -> C:\Users\Shober\Desktop\CppShowcaseBoostrap\CompiledBinaries\CppShowcaseBootstrap.exe
+C:\Users\Shober\Desktop\CppShowcaseBoostrap\CppShowcaseBootstrap.cpp(151,25): warning C4244: 'initializing': conversion from 'zip_int64_t' to 'int', possible loss of data
+C:\Users\Shober\Desktop\CppShowcaseBoostrap\CppShowcaseBootstrap.cpp(168,23): warning C4244: 'initializing': conversion from 'zip_int64_t' to 'int', possible loss of data
+CppShowcaseBootstrap.obj : error LNK2019: unresolved external symbol __imp_zip_close referenced in function main
+CppShowcaseBootstrap.obj : error LNK2019: unresolved external symbol __imp_zip_fclose referenced in function main
+CppShowcaseBootstrap.obj : error LNK2019: unresolved external symbol __imp_zip_fopen_index referenced in function main
+CppShowcaseBootstrap.obj : error LNK2019: unresolved external symbol __imp_zip_fread referenced in function main
+CppShowcaseBootstrap.obj : error LNK2019: unresolved external symbol __imp_zip_name_locate referenced in function main
+CppShowcaseBootstrap.obj : error LNK2019: unresolved external symbol __imp_zip_open referenced in function main
+CppShowcaseBootstrap.obj : error LNK2019: unresolved external symbol __imp_zip_stat_index referenced in function main
+CppShowcaseBootstrap.obj : error LNK2019: unresolved external symbol __imp_zip_stat_init referenced in function main
+CppShowcaseBootstrap.obj : error LNK2019: unresolved external symbol __imp_zip_strerror referenced in function main
+.\CompiledBinaries\CppShowcaseBootstrap.exe : fatal error LNK1120: 9 unresolved externals

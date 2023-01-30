@@ -2,3 +2,4 @@ C:\Users\Shober\Desktop\CppShowcaseBoostrap\CompiledBinaries\git2.dll
 C:\Users\Shober\Desktop\CppShowcaseBoostrap\CompiledBinaries\pcred.dll
 C:\Users\Shober\Desktop\CppShowcaseBoostrap\CompiledBinaries\zlibd1.dll
 C:\Users\Shober\Desktop\CppShowcaseBoostrap\x64\Debug\CppShowcaseBootstrap.vcxproj.CopyComplete
+C:\Users\Shober\Desktop\CppShowcaseBoostrap\CompiledBinaries\libcurl-d.dll

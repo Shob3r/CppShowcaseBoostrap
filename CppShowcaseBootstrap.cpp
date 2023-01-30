@@ -8,9 +8,12 @@
 #include <iostream>
 #include <stdio.h>
 #include <CommCtrl.h>
-#include "include/curl/curl.h"
-#include "include/git2.h"
-#include <zlib.h>
+#include <curl/curl.h>
+#include <git2.h>
+#include <fstream>
+#include <archive.h>
+#include <archive_entry.h>
+
 
 #pragma warning(disable:4996)
 #pragma comment(lib, "WinHTTP.lib")
@@ -52,7 +55,7 @@ int main() {
 	// Check if app is installed
 	if (std::filesystem::exists(InstallDir) && std::filesystem::is_directory(InstallDir)) {
 		// App is installed!
-		std::cout << "Folder exists and app is installed!";
+		std::cout << "Folder exists and app is installed!" << endl;
 		int cloneCheck = git_repository_open(&repo, InstallDir.c_str());
 		if (cloneCheck < 0) {
 			std::cout << "Could not find the source code!";
@@ -95,17 +98,10 @@ int main() {
 
 					if (std::filesystem::exists(NodeJsInstallDir)) {
 						// Node.JS is installed, Continue to cloning the repo.
-						// No need to add anything in this section
+						std::cout << "Nodejs Is installed!!!" << endl;
 					}
 					else {
 						// Node.JS is NOT installed, Download Node.js and clone the repo after it's installed
-						// Create the download progress bar
-						HWND ProgressBar = CreateWindowA(
-							"Static", "Downloading Prerequisites...",
-							WS_POPUP | WS_VISIBLE,
-							CW_USEDEFAULT, CW_USEDEFAULT, 150, 50,
-							NULL, NULL, NULL, NULL
-						);
 						// Start Libcurl
 						curl = curl_easy_init();
 						if (curl) {
@@ -137,20 +133,39 @@ int main() {
 							curl_easy_cleanup(curl);
 							fclose(fp);
 							// Close the prograssbar for the download
-							DestroyWindow(ProgressBar);
 
 							//Check for download errors
 							if (res != CURLE_OK) {
 								std::cout << "Error while downloading: " << curl_easy_strerror(res) << endl;
 								return 1;
 							}
-						}
-						else {
-							std::cout << "Could not start libcurl!";
-							return 1;
+
+							// Download is done, time to extract with libarchive
+							string nodeZip = "./tools/node.zip";
+							struct archive* a = archive_read_new();
+							archive_read_support_format_zip(a);
+
+							// Open the zip file and EXTRACTTTTTT
+							int extractCheck = archive_read_open_filename(a, nodeZip.c_str(), 10240);
+							if (extractCheck != ARCHIVE_OK) {
+							std:cerr << "Error while opening archive: " << archive_error_string(a) << std::endl;
+								return 1;
+							}
+							struct archive_entry* entry;
+							while (archive_read_next_header(a, &entry) == ARCHIVE_OK) {
+								// Extracting time
+								extractCheck = archive_read_extract(a, entry, 0);
+								if (extractCheck != ARCHIVE_OK) {
+								std:cerr << "Error while extracting: " << archive_error_string(a) << std::endl;
+								}
+							}
+							// Clean up
+							archive_read_free(a);
+							
+							// Time to clone the repository to the folder and then npm i 
+
 						}
 					}
-					// Download is done, time to extract with zlib
 				}
 				else {
 					MessageBoxEx(NULL, L"Could not connect to the internet! run this file again once you have connected to the internet", L"Error!", MB_OK | MB_ICONERROR | MB_APPLMODAL | MB_SETFOREGROUND | MB_TOPMOST, LANG_NEUTRAL);
@@ -161,9 +176,7 @@ int main() {
 				MessageBoxEx(NULL, L"Could not start WinHttp! this error is probably related to you still being on Windows 95 or you have something really wrong with your PC", L"Error!", MB_OK | MB_ICONERROR | MB_APPLMODAL | MB_SETFOREGROUND | MB_TOPMOST, LANG_NEUTRAL);
 				return 1;
 			}
-		}
-		else {
-			std::cout << "Error while creating the directory: " << errorCode.message();
+
 		}
 	}
 }
