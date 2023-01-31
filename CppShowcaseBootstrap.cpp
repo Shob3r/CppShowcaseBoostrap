@@ -13,7 +13,9 @@
 #include <fstream>
 #include <archive.h>
 #include <archive_entry.h>
-
+#include <stdlib.h>
+#include <cstdlib>
+#include <ShlObj.h>
 
 #pragma warning(disable:4996)
 #pragma comment(lib, "WinHTTP.lib")
@@ -28,7 +30,9 @@ size_t write_data(void* ptr, size_t size, size_t nmemb, FILE* stream) {
 
 using namespace std;
 
-int main(int argc, char* argv[]) {
+int main() {
+
+
 	// Install dir variables
 	string appData = getenv("APPDATA");
 	string InstallDir = appData + "\\CppShowcase";
@@ -63,7 +67,7 @@ int main(int argc, char* argv[]) {
 	strcat(GitShowcaseDir, "\\my_subfolder\\");
 
 	// Check if app is installed
-	
+
 	if (std::filesystem::exists(InstallDir) && std::filesystem::is_directory(InstallDir)) {
 		// App is installed!
 		std::cout << "Folder exists and app is installed!" << endl;
@@ -89,13 +93,14 @@ int main(int argc, char* argv[]) {
 		git_repository_free(repo);
 		git_libgit2_shutdown();
 
+		system("tools\\runnpm.bat");
 		return 0;
 	}
 
 	else {
 		// App is not Cloned nor installed, script proceeds as normal
 		if (std::filesystem::create_directory(InstallDir, errorCode)) {
-			std::cout << "folder successfully created!";
+			std::cout << "folder successfully created!" << std::endl;
 
 			HINTERNET hSession = WinHttpOpen(L"PersonalPInternetChecker",
 				WINHTTP_ACCESS_TYPE_AUTOMATIC_PROXY,
@@ -110,18 +115,17 @@ int main(int argc, char* argv[]) {
 					if (std::filesystem::exists(NodeJsInstallDir)) {
 						// Node.JS is installed, Continue to cloning the repo.
 						std::cout << "Nodejs Is installed!!!" << endl;
-						
-						int AppCloneCheck = git_clone(&repo, "https://github.com/Shob3r/CppShowcase.git", GitShowcaseDir, &clone_options);
 
-						if (AppCloneCheck < 0) {
-							const git_error* err = giterr_last();
-							std::cerr << "Error: " << err->message << std::endl;
-							git_repository_free(repo);
+						int repoCloneCheck = git_clone(&repo, "https://github.com/Shob3r/CppShowcase.git", InstallDir.c_str(), NULL);
+						if (repoCloneCheck < 0) {
+							const git_error* e = giterr_last();
+							std::cerr << "Error: " << repoCloneCheck << " / " << e->message << std::endl;
 							return 1;
 						}
+
 						git_repository_free(repo);
 						git_libgit2_shutdown();
-
+						system("cmd");
 						return 0;
 					}
 					else {
@@ -166,39 +170,20 @@ int main(int argc, char* argv[]) {
 
 							// Download is done, time to extract with libarchive
 							string nodeZip = "./tools/node.zip";
-							struct archive* a = archive_read_new();
-							archive_read_support_format_zip(a);
 
-							// Open the zip file and EXTRACTTTTTT
-							int extractCheck = archive_read_open_filename(a, nodeZip.c_str(), 10240);
-							if (extractCheck != ARCHIVE_OK) {
-							std:cerr << "Error while opening archive: " << archive_error_string(a) << std::endl;
+							// Time to clone the repository to the folder and then npm i
+
+							int repoCloneCheck = git_clone(&repo, "https://github.com/Shob3r/CppShowcase.git", InstallDir.c_str(), NULL);
+							if (repoCloneCheck < 0) {
+								const git_error* e = giterr_last();
+								std::cerr << "Error: " << repoCloneCheck << " / " << e->message << std::endl;
 								return 1;
 							}
-							struct archive_entry* entry;
-							while (archive_read_next_header(a, &entry) == ARCHIVE_OK) {
-								// Extracting time
-								extractCheck = archive_read_extract(a, entry, 0);
-								if (extractCheck != ARCHIVE_OK) {
-								std:cerr << "Error while extracting: " << archive_error_string(a) << std::endl;
-								}
-							}
-							// Clean up
-							archive_read_free(a);
-							
-							// Time to clone the repository to the folder and then npm i 
 
-							int AppCloneCheck = git_clone(&repo, "https://github.com/Shob3r/CppShowcase.git", GitShowcaseDir, &clone_options);
-
-							if (AppCloneCheck < 0) {
-								const git_error* err = giterr_last();
-								std::cerr << "Error: " << err->message << std::endl;
-								git_repository_free(repo);
-								return 1;
-							}
 							git_repository_free(repo);
 							git_libgit2_shutdown();
-							return 0; 
+
+							return 0;
 						}
 					}
 				}
@@ -211,7 +196,6 @@ int main(int argc, char* argv[]) {
 				MessageBoxEx(NULL, L"Could not start WinHttp! this error is probably related to you still being on Windows 95 or you have something really wrong with your PC", L"Error!", MB_OK | MB_ICONERROR | MB_APPLMODAL | MB_SETFOREGROUND | MB_TOPMOST, LANG_NEUTRAL);
 				return 1;
 			}
-
 		}
 	}
 }
