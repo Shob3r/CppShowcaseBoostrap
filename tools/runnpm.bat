@@ -9,6 +9,7 @@ if exist %nodeInstallDir% (
 ) 
 
 else (
+	powershell Expand-Archive -Path .\node.zip -DestinationPath .\node
 	set CURR_DIR=%CD%\node
 	setx PATH "%PATH%;%CURR_DIR%"
 	refreshenv

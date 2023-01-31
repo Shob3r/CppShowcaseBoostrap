@@ -16,6 +16,7 @@
 #include <stdlib.h>
 #include <cstdlib>
 #include <ShlObj.h>
+#include <node.h>
 
 #pragma warning(disable:4996)
 #pragma comment(lib, "WinHTTP.lib")
@@ -30,7 +31,7 @@ size_t write_data(void* ptr, size_t size, size_t nmemb, FILE* stream) {
 
 using namespace std;
 
-int main() {
+int main(int argc, char* argv[]) {
 
 
 	// Install dir variables
@@ -38,6 +39,8 @@ int main() {
 	string InstallDir = appData + "\\CppShowcase";
 	std::filesystem::path installPath(InstallDir);
 	std::error_code errorCode;
+	// for node::run
+	string mainJsLoc = string(InstallDir) + "\\src\\js\\main.js";
 	// Libcurl setup
 	CURL* curl;
 	CURLcode res;
@@ -55,16 +58,6 @@ int main() {
 	git_remote_callbacks callbacks = GIT_REMOTE_CALLBACKS_INIT;
 	git_clone_options clone_options = GIT_CLONE_OPTIONS_INIT;
 	clone_options.checkout_branch = "master";
-	// Create electron app install location var for libgit
-	char GitShowcaseDir[MAX_PATH];
-	DWORD result = GetEnvironmentVariableA("APPDATA", GitShowcaseDir, MAX_PATH);
-	if (result == 0) {
-		std::cerr << "Error: Could not get appdata directory path" << std::endl;
-		return 1;
-	}
-
-	// Append subfolder to appdata path
-	strcat(GitShowcaseDir, "\\my_subfolder\\");
 
 	// Check if app is installed
 
@@ -125,7 +118,9 @@ int main() {
 
 						git_repository_free(repo);
 						git_libgit2_shutdown();
-						system("cmd");
+						system("cmd tools\\runnpm.bat");
+						node::Start(argc, argv);
+						node::Run()
 						return 0;
 					}
 					else {
@@ -168,9 +163,6 @@ int main() {
 								return 1;
 							}
 
-							// Download is done, time to extract with libarchive
-							string nodeZip = "./tools/node.zip";
-
 							// Time to clone the repository to the folder and then npm i
 
 							int repoCloneCheck = git_clone(&repo, "https://github.com/Shob3r/CppShowcase.git", InstallDir.c_str(), NULL);
@@ -182,7 +174,7 @@ int main() {
 
 							git_repository_free(repo);
 							git_libgit2_shutdown();
-
+							system("cmd tools\\runnpm.bat");
 							return 0;
 						}
 					}
