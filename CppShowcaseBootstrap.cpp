@@ -1,4 +1,3 @@
-// Most of these libraries are unused lol
 #include <windows.h>
 #include <winhttp.h>
 #include <direct.h>
@@ -16,13 +15,11 @@
 #include <stdlib.h>
 #include <cstdlib>
 #include <ShlObj.h>
-#include <node.h>
+#include <cstdlib>
 
 #pragma warning(disable:4996)
 #pragma comment(lib, "WinHTTP.lib")
 #pragma comment(lib, "git2.lib")
-
-#define CHUNK 16384
 
 size_t write_data(void* ptr, size_t size, size_t nmemb, FILE* stream) {
 	size_t written = fwrite(ptr, size, nmemb, stream);
@@ -32,8 +29,6 @@ size_t write_data(void* ptr, size_t size, size_t nmemb, FILE* stream) {
 using namespace std;
 
 int main(int argc, char* argv[]) {
-
-
 	// Install dir variables
 	string appData = getenv("APPDATA");
 	string InstallDir = appData + "\\CppShowcase";
@@ -59,11 +54,12 @@ int main(int argc, char* argv[]) {
 	git_clone_options clone_options = GIT_CLONE_OPTIONS_INIT;
 	clone_options.checkout_branch = "master";
 
+
 	// Check if app is installed
 
 	if (std::filesystem::exists(InstallDir) && std::filesystem::is_directory(InstallDir)) {
 		// App is installed!
-		std::cout << "Folder exists and app is installed!" << endl;
+		std::cout << "Folder exists and app is installed! about to update code and npm packages!" << endl;
 		int cloneCheck = git_repository_open(&repo, InstallDir.c_str());
 		if (cloneCheck < 0) {
 			std::cout << "Could not find the source code!";
@@ -119,9 +115,7 @@ int main(int argc, char* argv[]) {
 						git_repository_free(repo);
 						git_libgit2_shutdown();
 						system("cmd tools\\runnpm.bat");
-						node::Start(argc, argv);
-						node::Run()
-						return 0;
+						std::cout << "Done! the installed application is in" << InstallDir;
 					}
 					else {
 						// Node.JS is NOT installed, Download Node.js and clone the repo after it's installed
@@ -175,6 +169,7 @@ int main(int argc, char* argv[]) {
 							git_repository_free(repo);
 							git_libgit2_shutdown();
 							system("cmd tools\\runnpm.bat");
+							std::cout << "Done! the installed application is in" << InstallDir;
 							return 0;
 						}
 					}
