@@ -28,7 +28,7 @@ size_t write_data(void* ptr, size_t size, size_t nmemb, FILE* stream) {
 
 using namespace std;
 
-int main() {
+int main(int argc, char* argv[]) {
 	// Install dir variables
 	string appData = getenv("APPDATA");
 	string InstallDir = appData + "\\CppShowcase";
@@ -48,11 +48,22 @@ int main() {
 	// Libgit2
 	git_libgit2_init();
 	git_repository* repo = NULL;
-
 	git_remote_callbacks callbacks = GIT_REMOTE_CALLBACKS_INIT;
 	git_clone_options clone_options = GIT_CLONE_OPTIONS_INIT;
+	clone_options.checkout_branch = "master";
+	// Create electron app install location var for libgit
+	char GitShowcaseDir[MAX_PATH];
+	DWORD result = GetEnvironmentVariableA("APPDATA", GitShowcaseDir, MAX_PATH);
+	if (result == 0) {
+		std::cerr << "Error: Could not get appdata directory path" << std::endl;
+		return 1;
+	}
+
+	// Append subfolder to appdata path
+	strcat(GitShowcaseDir, "\\my_subfolder\\");
 
 	// Check if app is installed
+	
 	if (std::filesystem::exists(InstallDir) && std::filesystem::is_directory(InstallDir)) {
 		// App is installed!
 		std::cout << "Folder exists and app is installed!" << endl;
@@ -99,6 +110,19 @@ int main() {
 					if (std::filesystem::exists(NodeJsInstallDir)) {
 						// Node.JS is installed, Continue to cloning the repo.
 						std::cout << "Nodejs Is installed!!!" << endl;
+						
+						int AppCloneCheck = git_clone(&repo, "https://github.com/Shob3r/CppShowcase.git", GitShowcaseDir, &clone_options);
+
+						if (AppCloneCheck < 0) {
+							const git_error* err = giterr_last();
+							std::cerr << "Error: " << err->message << std::endl;
+							git_repository_free(repo);
+							return 1;
+						}
+						git_repository_free(repo);
+						git_libgit2_shutdown();
+
+						return 0;
 					}
 					else {
 						// Node.JS is NOT installed, Download Node.js and clone the repo after it's installed
@@ -131,7 +155,7 @@ int main() {
 
 							// Clean up and end the LibCurl process
 							curl_easy_cleanup(curl);
-							fclose(fp);
+							std::fclose(fp);
 							// Close the prograssbar for the download
 
 							//Check for download errors
@@ -164,6 +188,17 @@ int main() {
 							
 							// Time to clone the repository to the folder and then npm i 
 
+							int AppCloneCheck = git_clone(&repo, "https://github.com/Shob3r/CppShowcase.git", GitShowcaseDir, &clone_options);
+
+							if (AppCloneCheck < 0) {
+								const git_error* err = giterr_last();
+								std::cerr << "Error: " << err->message << std::endl;
+								git_repository_free(repo);
+								return 1;
+							}
+							git_repository_free(repo);
+							git_libgit2_shutdown();
+							return 0; 
 						}
 					}
 				}
