@@ -5,4 +5,4 @@ the sole purpose of this app is to clone the main app section of my personal pro
 
 - Windows 10
 - Vcpkg
-- libcurl, libgit2 and libarchive installed through vcpkg
+- libcurl and libgit2 installed through vcpkg
