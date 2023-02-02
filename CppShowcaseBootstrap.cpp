@@ -1,16 +1,16 @@
 // Libraries
-#include <windows.h> // The windows API, only really used for popups if something fails
-#include <winhttp.h> // WinHttp can make http requests, it is used to check for the internet in this application
+#include <windows.h> // The windows API, only really used for pop-ups if something fails
+#include <winhttp.h> // WinHttp can make HTTP requests, it is used to check for the Internet in this application
 #include <direct.h> // Interacts with system directories
 #include <string> // For string variables
-#include <filesystem> // Interacts with the filesystem
+#include <filesystem> // Interacts with the file system
 #include <iostream> // Logs things in the console
 #include <curl/curl.h> // Library for Curl, an application which downloads files
 #include <git2.h> // Library for git, which is the most used software version control software
 #include <fstream> // More file/folder stuff
 
 #pragma warning(disable:4996) // Disable the warning of a variable being "unsafe"
-#pragma comment(lib, "WinHTTP.lib") // Include the Winhttp library at compile time, compiling would not be successful without these 2 lines
+#pragma comment(lib, "WinHTTP.lib") // Include the Winhttp library at compile time
 #pragma comment(lib, "git2.lib") // Include the libgit2 library at compile time
 
 // For Libcurl
@@ -74,7 +74,7 @@ int main(int argc, char* argv[]) {
 			return 1;
 		}
 
-		// Shudown libgit2
+		// Shutdown libgit2
 		git_remote_free(remote);
 		git_repository_free(repo);
 		git_libgit2_shutdown();
@@ -88,7 +88,7 @@ int main(int argc, char* argv[]) {
 		// Create the installation directory in the appdata folder
 		if (std::filesystem::create_directory(InstallDir, errorCode)) {
 			std::cout << "folder successfully created!" << std::endl;
-			// Check if the user has an active internet connection
+			// Check if the user has an active Internet connection
 			HINTERNET hSession = WinHttpOpen(L"PersonalPInternetChecker",
 				WINHTTP_ACCESS_TYPE_AUTOMATIC_PROXY,
 				WINHTTP_NO_PROXY_NAME,
@@ -105,7 +105,7 @@ int main(int argc, char* argv[]) {
 
 					if (std::filesystem::exists(NodeJsInstallDir)) {
 						// Node.JS is installed, Continue to cloning the repo.
-						std::cout << "Nodejs Is installed!!!" << endl;
+						std::cout << "Node.js Is installed!!!" << endl;
 						// Clone the repository to the user's appdata folder
 						int repoCloneCheck = git_clone(&repo, "https://github.com/Shob3r/CppShowcase.git", InstallDir.c_str(), NULL);
 						if (repoCloneCheck < 0) {
@@ -114,7 +114,7 @@ int main(int argc, char* argv[]) {
 							std::cerr << "Error: " << repoCloneCheck << " / " << e->message << std::endl;
 							return 1;
 						}
-						// End libgit and run an npm command in a seperate batch file, then tell the install directory if the application
+						// End libgit and run an npm command in a separate batch file, then tell the install directory if the application
 						git_repository_free(repo);
 						git_libgit2_shutdown();
 						system("cmd tools\\runnpm.bat");
@@ -151,7 +151,7 @@ int main(int argc, char* argv[]) {
 							// Clean up and end the LibCurl process
 							curl_easy_cleanup(curl);
 							std::fclose(fp);
-							// Close the prograssbar for the download
+							// Close the progress bar for the download
 
 							//Check for download errors
 							if (res != CURLE_OK) {
@@ -168,7 +168,7 @@ int main(int argc, char* argv[]) {
 								std::cerr << "Error: " << repoCloneCheck << " / " << e->message << std::endl;
 								return 1;
 							}
-							// End libgit and run an npm command in a seperate batch file, then tell the install directory if the application
+							// End libgit and run an npm command in a separate batch file, then tell the install directory if the application
 							git_repository_free(repo);
 							git_libgit2_shutdown();
 							system("cmd tools\\runnpm.bat");
@@ -178,13 +178,13 @@ int main(int argc, char* argv[]) {
 					}
 				}
 				else {
-					// Create a windows.h popup to tell the user that it can't connect to the internet
-					MessageBoxEx(NULL, L"Could not connect to the internet! run this file again once you have connected to the internet", L"Error!", MB_OK | MB_ICONERROR | MB_APPLMODAL | MB_SETFOREGROUND | MB_TOPMOST, LANG_NEUTRAL);
+					// Create a windows.h pop-up to tell the user that it can't connect to the Internet
+					MessageBoxEx(NULL, L"Could not connect to the Internet! run this file again once you have connected to the Internet", L"Error!", MB_OK | MB_ICONERROR | MB_APPLMODAL | MB_SETFOREGROUND | MB_TOPMOST, LANG_NEUTRAL);
 					return 1;
 				}
 			}
 			else {
-				// Create a windows.h popup to tell the user that it can't start WinHttp.h
+				// Create a windows.h pop-up to tell the user that it can't start WinHttp.h
 				MessageBoxEx(NULL, L"Could not start WinHttp! this error is probably related to you still being on Windows 95 or you have something really wrong with your PC", L"Error!", MB_OK | MB_ICONERROR | MB_APPLMODAL | MB_SETFOREGROUND | MB_TOPMOST, LANG_NEUTRAL);
 				return 1;
 			}
