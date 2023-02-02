@@ -1,4 +1,4 @@
-// libraries
+// Libraries
 #include <windows.h> // The windows API, only really used for popups if something fails
 #include <winhttp.h> // WinHttp can make http requests, it is used to check for the internet in this application
 #include <direct.h> // Interacts with system directories
