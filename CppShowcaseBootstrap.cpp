@@ -9,7 +9,7 @@
 #include <git2.h> // Library for git, which is the most used software version control software
 #include <fstream> // More file/folder stuff
 
-#pragma warning(disable:4996) // Disable the warning of a variable being "unsafe"
+#pragma warning(disable:4996) // Disable the warning of a variable being "unsafe" (it is but I can't bother to make it safe)
 #pragma comment(lib, "WinHTTP.lib") // Include the Winhttp library at compile time
 #pragma comment(lib, "git2.lib") // Include the libgit2 library at compile time
 
